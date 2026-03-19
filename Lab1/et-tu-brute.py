@@ -7,6 +7,8 @@
 # A program that attempts to solve cipher texts that are 
 # shifted by some number.
 
+#from sys import stdin
+import sys
 
 # the alphabet
 ALPHABET = """abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQ
@@ -15,14 +17,15 @@ ALPHABET = """abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQ
               
 
 # debug for test printing 
-DEBUG = false 
+DEBUG = False 
 
 
 ### MAIN ### 
    
 
 # taking input from StdIn 
-
+userInput: str = sys.stdin.read()
+print(userInput)
 
 # trying several different shifts
 
