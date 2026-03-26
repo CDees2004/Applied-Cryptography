@@ -17,7 +17,7 @@ ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`~!@#$
 
 
 # debug for test printing 
-DEBUG = True
+DEBUG = False
 
 
 # -- reading the contents of the dictionary file --
