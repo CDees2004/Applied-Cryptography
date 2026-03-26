@@ -9,19 +9,24 @@
 
 import sys
 
-with open("dictionary.txt", "r") as dictionary:
-    dictionary_content = dictionary.read()
-
 # the alphabet
 ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/? "
 
+# ciphertext-3 alphabet 
+#ALPHABET = " -,;:!?/.'\"()[]$&#%012345789aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxyYzZ"
+
 
 # debug for test printing 
-DEBUG = True
+DEBUG = False
+
+
+# -- reading the contents of the dictionary file --
+with open("dictionary.txt", "r") as dictionary:
+    dictionary_content = dictionary.read()
 
 
 # -- taking input from StdIn -- 
-def take_input()->str:
+def take_input() ->str:
     userInput: str = sys.stdin.read()
     if(DEBUG):
         print(userInput)
@@ -30,7 +35,7 @@ def take_input()->str:
 
 # -- performing a caesar cipher shift --
 # take in alphabet list and shift amount, return shifted alphabet 
-def caesar_shift(alphabet: str, cipher_text: str, shift_amount: int)->str: 
+def caesar_shift(alphabet: str, cipher_text: str, shift_amount: int) ->str: 
     alphabet_length: int = len(ALPHABET) 
     result: list[str] = []
     
@@ -54,24 +59,46 @@ def caesar_shift(alphabet: str, cipher_text: str, shift_amount: int)->str:
 
 
 # -- trying all rotations -- 
-def try_rotations(cipher_text: str): 
+def try_rotations(cipher_text: str) ->list[str]:
+    candidate_ciphers: list = []
     for i in range(len(ALPHABET)):
+        
         plain_text_attempt: str = caesar_shift(ALPHABET, cipher_text, i)
+        candidate_ciphers.append(plain_text_attempt)
         if(DEBUG): 
             print(f"Shift of {i} \n", plain_text_attempt)
+    return candidate_ciphers
         
     
-# -- determine which results are valid by comparing word amount to
-#    dictionary text file --
-def test_against_dictionary(candidate_cipher: str): 
+# -- testing candidates against dictionary -- 
+# helper function that tests one candidate against the dictionary giving an accuracy percentage 
+def test_against_dictionary(candidate_cipher: str) ->float: 
     score: int = 0 
-    for word in candidate_cipher: 
-        if word in dictionary_content
+    # tokenize candidate 
+    split_candidate = candidate_cipher.split()
+    for word in split_candidate: 
+        if word in dictionary_content: 
+            score += 1
+    
+    return score / len(split_candidate)
+    
+    
+# test all candidates, returns the final best plaintext candidate 
+def get_best_candidate(candidate_ciphers: list[str]) ->str: 
+    scores: dict[float, str] = {}
+    for candidate in candidate_ciphers: 
+        # scores.append(test_against_dictionary(candidate))
+        scores[candidate] = test_against_dictionary(candidate)
+        
+    # get key associated with kv pair that has max score value 
+    best_candidate = max(scores, key=scores.get)
+    return best_candidate   
 
 
 ### MAIN ### 
 user_input_ciphertext: str = take_input()
-try_rotations(user_input_ciphertext)
-#test_case: str = caesar_shift(ALPHABET, user_input_ciphertext, 1)
+candidate_ciphers = try_rotations(user_input_ciphertext)
+print(get_best_candidate(candidate_ciphers))
+
 
    
