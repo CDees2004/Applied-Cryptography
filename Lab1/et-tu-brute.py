@@ -9,6 +9,9 @@
 
 import sys
 
+with open("dictionary.txt", "r") as dictionary:
+    dictionary_content = dictionary.read()
+
 # the alphabet
 ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/? "
 
@@ -48,8 +51,8 @@ def caesar_shift(alphabet: str, cipher_text: str, shift_amount: int)->str:
             string_result.append(shifted_alphabet[original_index])
         
     return "".join(string_result)
-    
-    
+
+
 # -- trying all rotations -- 
 def try_rotations(cipher_text: str): 
     for i in range(len(ALPHABET)):
@@ -60,6 +63,10 @@ def try_rotations(cipher_text: str):
     
 # -- determine which results are valid by comparing word amount to
 #    dictionary text file --
+def test_against_dictionary(candidate_cipher: str): 
+    score: int = 0 
+    for word in candidate_cipher: 
+        if word in dictionary_content
 
 
 ### MAIN ### 
