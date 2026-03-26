@@ -17,7 +17,7 @@ ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`~!@#$
 
 
 # debug for test printing 
-DEBUG = False
+DEBUG = True
 
 
 # -- reading the contents of the dictionary file --
@@ -59,12 +59,12 @@ def caesar_shift(alphabet: str, cipher_text: str, shift_amount: int) ->str:
 
 
 # -- trying all rotations -- 
-def try_rotations(cipher_text: str) ->list[str]:
-    candidate_ciphers: list = []
+def try_rotations(cipher_text: str) ->dict[int, str]:
+    candidate_ciphers: dict[int, str] = {}
     for i in range(len(ALPHABET)):
         
         plain_text_attempt: str = caesar_shift(ALPHABET, cipher_text, i)
-        candidate_ciphers.append(plain_text_attempt)
+        candidate_ciphers[i] = plain_text_attempt
         if(DEBUG): 
             print(f"Shift of {i} \n", plain_text_attempt)
     return candidate_ciphers
@@ -84,21 +84,28 @@ def test_against_dictionary(candidate_cipher: str) ->float:
     
     
 # test all candidates, returns the final best plaintext candidate 
-def get_best_candidate(candidate_ciphers: list[str]) ->str: 
+def get_best_candidate(candidate_ciphers: dict[int, str]) ->tuple[int, str]: 
     scores: dict[float, str] = {}
-    for candidate in candidate_ciphers: 
+    # note the candidates are the values in the KV pair 
+    for candidate in candidate_ciphers.values(): 
         # scores.append(test_against_dictionary(candidate))
         scores[candidate] = test_against_dictionary(candidate)
-        
+    
     # get key associated with kv pair that has max score value 
-    best_candidate = max(scores, key=scores.get)
-    return best_candidate   
-
+    best_candidate: str = max(scores, key=scores.get)
+    
+    # getting the associated rotation with the winning candidate 
+    for key, value in candidate_ciphers.items(): 
+        if(value == best_candidate): 
+            rotation: int = key 
+            
+    final_result: tuple(int, str) = (rotation, best_candidate)
+    return final_result
 
 ### MAIN ### 
 user_input_ciphertext: str = take_input()
 candidate_ciphers = try_rotations(user_input_ciphertext)
-print(get_best_candidate(candidate_ciphers))
-
+final_result: tuple[int, str] = get_best_candidate(candidate_ciphers)
+print(f"Shift of {final_result[0]}:\n{final_result[1]}")
 
    
