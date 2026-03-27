@@ -21,3 +21,12 @@ def take_input() ->str:
     if(DEBUG):
         print(userInput)
     return userInput
+    
+    
+# -- reading the contents of the dictionary file --
+with open("dictionary.txt", "r") as dictionary:
+    dictionary_content = dictionary.read()
+    
+
+    
+### MAIN ###
