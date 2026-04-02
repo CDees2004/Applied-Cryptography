@@ -18,6 +18,8 @@ PUNCTUATION = ".,!?;:'\"()[]{}<>-_+=/\\|`~@#$%^&*"
 
 # debug for test printing 
 DEBUG = False 
+THRESHOLD = 0.60 # threshold for judging candidate plaintexts, can be adjusted for better results
+TOP_CANDIDATES = 25 # number of top candidates to print for each ciphertext, can be adjusted for better results
 
 
 # -- top level notes -- 
@@ -201,6 +203,19 @@ def compare_against_dictionary(candidate: str) -> float:
     return score / len(words)
     
 
+# helper function for the second-pass fallback
+# Keeps Chandler original function and helps
+def get_top_candidates(candidates: dict[str, str], limit: int) -> list[tuple[str, str, float]]:
+    scored_candidates: list[tuple[str, str, float]] = []
+    
+    for key, plaintext in candidates.items(): 
+        score = compare_against_dictionary(text) 
+        scored_candidates.append((key, text, score))
+    
+    # sort candidates by score in descending order and return the top ones
+    scored_candidates.sort(key=lambda x: x[2], reverse=True)
+    return scored_candidates[:limit]
+
 # -- finding the best key and plaintext based on the score from comparison -- 
 def get_best_candidate(candidates: dict[str, str]) -> tuple[str, str]: 
     # also borrows a  lot from program 1 
@@ -228,8 +243,38 @@ def get_best_candidate(candidates: dict[str, str]) -> tuple[str, str]:
 normalize_dictionary()
 
 user_input: str = take_input()
-candidates = try_keys(user_input) 
-key, plaintext = get_best_candidate(candidates) 
 
-print(f"KEY={key}") 
-print(plaintext)
+# first pass: original 
+candidates = try_keys(user_input) 
+key, plaintext = get_best_candidate(candidates)
+best_score = compare_against_dictionary(plaintext) 
+
+# if text looks good, print the output
+if best_score >= THRESHOLD: 
+    print(f"KEY={key}") 
+    print(plaintext)
+
+# second pass fallback:
+else:
+    top_candidates = get_top_candidates(candidates, TOP_CANDIDATES)
+
+    best_key_ouput: str = key
+    best_plaintext: str = plaintext
+    overall_best_score: float = best_score
+
+    for first_key, first_text, first_score in top_candidates:
+        # try to decrypt the first pass plaintext with the first key
+        second_candidates = try_keys(first_text)
+        second_key, second_plaintext = get_best_candidate(second_candidates)
+        second_score = compare_against_dictionary(second_plaintext)
+
+        if DEBUG:
+            print(f"First Key: {first_key}, Second Key: {second_key}, Score: {second_score}")
+
+        if second_score > overall_best_score:
+            overall_best_score = second_score
+            best_key_ouput = f"{first_key} -> {second_key}"
+            best_plaintext = second_plaintext
+
+print(f"KEY={best_key_ouput}") 
+print(best_plaintext)
