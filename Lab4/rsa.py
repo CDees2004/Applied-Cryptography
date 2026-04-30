@@ -26,6 +26,7 @@ def is_prime(num: int) -> bool:
 
 # factors the input as the product of two prime numbers 
 def factor_n(n: int) -> tuple[int, int]:
+    # iterating to find two primes between 2 and 2^n + 1
     for p in range(2, int(n ** 0.5) + 1):
         if n % p == 0:
             q = n // p
@@ -48,7 +49,9 @@ def lcm(a: int, b: int) -> int:
 def generate_e(z: int) -> list[int]:
     values = []
     k = 1
-
+    
+    # infinite looping until e is GTE z 
+    # all combos with gcd 1 are added to e
     while True:
         e = (2 ** k) + 1
 
