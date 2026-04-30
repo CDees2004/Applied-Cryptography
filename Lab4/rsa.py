@@ -1,6 +1,15 @@
+# RSA
+#
+# Team Name: Encryptodes
+# Members:Barry Dees, Niko Krause, Javen Wilson,
+#         Steven Alleman, and Isiah Hinds.
+#
+# A program that implements the RSA algorithm 
+
 import sys
 
-def is_prime(num):
+# tests if a given input is prime 
+def is_prime(num: int) -> bool:
     if num < 2:
         return False
     if num == 2:
@@ -15,22 +24,28 @@ def is_prime(num):
         divisor += 2
     return True
 
-def factor_n(n):
+# factors the input as the product of two prime numbers 
+def factor_n(n: int) -> tuple[int, int]:
     for p in range(2, int(n ** 0.5) + 1):
         if n % p == 0:
             q = n // p
             if is_prime(p) and is_prime(q):
                 return p, q
 
-def gcd(a, b):
+# calculates the greatest common divisor of two integers
+def gcd(a: int, b: int) -> int:
     while b != 0:
         a, b = b, a % b
     return a
 
-def lcm(a, b):
+
+# calculates the lowest common multiple of two integers
+def lcm(a: int, b: int) -> int:
     return (a * b) // gcd(a, b)
 
-def generate_e(z):
+# generates values of e where 1 < e < z 
+# and that are of the form: 2^n + 1
+def generate_e(z: int) -> list[int]:
     values = []
     k = 1
 
@@ -46,7 +61,9 @@ def generate_e(z):
         k *= 2
     return values
 
-def mod_inverse(e, z):
+# calculates the modular inverse of e such that 
+# d = e^-1 (mod z)
+def mod_inverse(e: list[int], z: int) -> int:
     d = 1
 
     while d < z:
@@ -54,7 +71,8 @@ def mod_inverse(e, z):
             return d
         d += 1
 
-def decrypt_ciphertexts(ciphertexts, d, n):
+# decrypting the ciphertexts with the private key 
+def decrypt_ciphertexts(ciphertexts: list[str], d: int, n: int) -> str:
     message = ""
 
     for c in ciphertexts:
@@ -67,7 +85,8 @@ def decrypt_ciphertexts(ciphertexts, d, n):
 
     return message
 
-def read_input():
+# utilizing stdin to read user input 
+def read_input() -> tuple[int, str]:
     if len(sys.argv) > 1:
         with open(sys.argv[1], 'r') as f:
             lines = [line.strip() for line in f if line.strip()]
@@ -78,6 +97,7 @@ def read_input():
     ciphertexts = [int(x.strip()) for x in lines[1].split(",")]
     return n, ciphertexts
 
+### MAIN ###
 def main():
     n, ciphertexts = read_input()
 
