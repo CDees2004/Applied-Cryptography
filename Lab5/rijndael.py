@@ -51,25 +51,39 @@ def take_input() -> bytes:
     return user_input
     
 # Reading dictionary. Takes in file name and returns list of possible keys
-def read_dictionary(DICTIONARY_FILE: str) -> list[str]:
+def generate_candidate_keys(DICTIONARY_FILE: str) -> list[str]:
     # Opening dictionary, reading, putting each line into a list
-    possible_keys: list[str] = []
+    candidate_keys: list[str] = []
     
     dictionary: str = open(DICTIONARY_FILE)
     for line in dictionary:
-        possible_key:str = dictionary.readline()
-        possible_keys.append(possible_key)
+        candidate_key:str = dictionary.readline().rstrip()
+        candidate_keys.append(candidate_key)
       
-    return possible_keys
+    return candidate_keys
     
+def rijndael_encryption(ciphertext: str, candidate_keys: list[str]): # Don't know the return type yet
+    # Repeating the algorihm for every candidate key
+    for key in candidate_keys:
+        # Convert candidate key to bytes and hashing
+        byte_key: bytes = key.encode()
+        
+        hash_object = sha256()
+        hash_object.update(byte_key)
+        hashed_key = hash_object.digest()
+        
+        # Need to make byte array object rather than just bytes 
+        # because a bytes object is immutable
+        #initialization_vector
+
 
 # =====================================================
 # MAIN
 # =====================================================
 
 if __name__ == '__main__':
-    input: bytes = take_input()
-    print(read_dictionary(DICTIONARY_FILE))
-
+    input_ciphertext: bytes = take_input()
+    candidate_keys: str = generate_candidate_keys(DICTIONARY_FILE)
+    rijndael_encryption(input_ciphertext, candidate_keys)
 
 
