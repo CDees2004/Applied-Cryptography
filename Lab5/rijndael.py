@@ -12,7 +12,7 @@ from Crypto.Cipher import AES
 BLOCK_SIZE = 16
 
 # the padding character to use to make the plaintext a multiple of BLOCK_SIZE in length
-PAD_WITH = "#"
+PAD_WITH = b"#"
 
 
 # =====================================================
@@ -46,7 +46,9 @@ DICTIONARY_FILE = "dictionary1-3.txt"
 
 # Reading the ciphertext from Stdin as bytes
 def take_input() -> bytes:
-    return stdin.buffer.read()
+    user_input:bytes = stdin.read().encode('utf-8', errors='surrogateescape')
+    return user_input
+    # return stdin.buffer.read()
     
 # Reading dictionary. Takes in file name and returns list of possible keys
 def generate_candidate_keys(DICTIONARY_FILE: str) -> list[str]:
@@ -60,20 +62,31 @@ def generate_candidate_keys(DICTIONARY_FILE: str) -> list[str]:
             
     return candidate_keys
     
-def rijndael_encryption(ciphertext: str, candidate_keys: list[str]): # Don't know the return type yet
+def rijndael_decryption(ciphertext: bytes, candidate_keys: list[str]):
     # Repeating the algorihm for every candidate key
     for key in candidate_keys:
         # Convert candidate key to bytes and hashing
-        byte_key: bytes = key.encode()
+        byte_key: bytes = key.encode() # Using bytes intead of bytearray to prevent side effects
         
         hash_object = sha256()
         hash_object.update(byte_key)
         hashed_key = hash_object.digest()
         
-        # Need to make byte array object rather than just bytes 
-        # because a bytes object is immutable. EX: res = bytearray(s, "utf-8")
-        #initialization_vector
+        # IV is the first 16 bytes of the ciphertext 
+        initialization_vector: bytes = ciphertext[:16]
+        
+        # E is the rest of the ciphertext 
+        e: bytearray = bytearray(ciphertext[16:])
 
+        # # Need to pad E to be a multiple of the block size 
+        while (len(e) % BLOCK_SIZE != 0):
+            e.extend(PAD_WITH)
+        
+        # Applying the AES decryption algorithm
+        cipher = AES.new(hashed_key, AES.MODE_CBC, initialization_vector)
+        
+        plaintext: bytes = cipher.decrypt(e)
+      
 # =====================================================
 # MAIN
 # =====================================================
@@ -81,5 +94,4 @@ def rijndael_encryption(ciphertext: str, candidate_keys: list[str]): # Don't kno
 if __name__ == '__main__':
     input_ciphertext: bytes = take_input()
     candidate_keys: str = generate_candidate_keys(DICTIONARY_FILE)
-    #rijndael_encryption(input_ciphertext, candidate_keys)
-    print(candidate_keys)
+    rijndael_decryption(input_ciphertext, candidate_keys)
