@@ -1,0 +1,6 @@
+Hint from class:
+	10th character of alphabet: j or J.
+	The "seed" is the IV. <- Important bit.
+	IV is the initialization vector.
+	IV is within first 16 bytes, 0-15.
+	
